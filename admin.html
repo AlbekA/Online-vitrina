@@ -99,8 +99,6 @@
         >
           Войти
         </button>
-
-        <p class="text-xs text-slate-400 pt-2">Пароль: <span class="font-mono text-slate-700 font-semibold bg-slate-100 px-2 py-0.5 rounded">admin1234</span></p>
       </form>
     </div>
   </div>
@@ -285,7 +283,7 @@
             <!-- Цена -->
             <div class="sm:col-span-2">
               <label for="productPrice" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
-                Цена (₽) <span class="text-rose-500">*</span>
+                Цена (сом) <span class="text-rose-500">*</span>
               </label>
               <div class="relative">
                 <input 
@@ -295,10 +293,10 @@
                   step="any" 
                   required 
                   placeholder="например: 4500"
-                  class="w-full pl-4 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white text-sm font-semibold transition"
+                  class="w-full pl-4 pr-14 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white text-sm font-semibold transition"
                 />
                 <span class="absolute right-4 top-1/2 -translate-y-1/2 font-bold text-slate-400 text-sm">
-                  ₽
+                  сом
                 </span>
               </div>
             </div>
@@ -658,11 +656,12 @@
         }
 
         // 4. Запись в таблицу products
+        // В вашей таблице Supabase используются колонки: title, category, price, volume, image_url
         const newProduct = {
-          name: name,
+          title: name,
           category: category,
           price: price,
-          size: size,
+          volume: size,
           image_url: publicUrl
         };
 
@@ -671,17 +670,44 @@
           .insert([newProduct])
           .select();
 
-        // Fallback для альтернативных названий колонок
+        // Если в другой таблице используются другие имена (name / size / image)
         if (insertResult.error) {
           const errMsg = insertResult.error.message.toLowerCase();
-          const fallbackProduct = { ...newProduct };
-          if (errMsg.includes('"title"') || errMsg.includes('title')) fallbackProduct.title = name;
-          if (errMsg.includes('"volume"') || errMsg.includes('volume')) fallbackProduct.volume = size;
-          if (errMsg.includes('"image"') && !errMsg.includes('image_url')) fallbackProduct.image = publicUrl;
+          console.warn("Попытка записи с альтернативными именами колонок:", errMsg);
+
+          const candidateProduct = {
+            category: category,
+            price: price
+          };
+
+          // Поле названия: title или name
+          if (errMsg.includes("'name'")) {
+            candidateProduct.title = name;
+          } else if (errMsg.includes("'title'")) {
+            candidateProduct.name = name;
+          } else {
+            candidateProduct.title = name;
+          }
+
+          // Поле объема: volume или size
+          if (errMsg.includes("'size'")) {
+            candidateProduct.volume = size;
+          } else if (errMsg.includes("'volume'")) {
+            candidateProduct.size = size;
+          } else {
+            candidateProduct.volume = size;
+          }
+
+          // Поле фото: image_url или image
+          if (errMsg.includes("'image_url'")) {
+            candidateProduct.image = publicUrl;
+          } else {
+            candidateProduct.image_url = publicUrl;
+          }
 
           insertResult = await client
             .from(TABLE_NAME)
-            .insert([fallbackProduct])
+            .insert([candidateProduct])
             .select();
 
           if (insertResult.error) {
@@ -818,7 +844,7 @@
                   </h3>
                   <div class="mt-1.5 flex items-baseline gap-1">
                     <span class="text-base font-extrabold text-emerald-600">${price}</span>
-                    <span class="text-xs font-semibold text-slate-500">₽</span>
+                    <span class="text-xs font-semibold text-slate-500">сом</span>
                   </div>
                 </div>
 

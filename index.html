@@ -278,7 +278,7 @@
               <span id="modalPrice" class="font-serif text-2xl font-semibold text-[#cbb592]">
                 0
               </span>
-              <span class="text-xs font-medium text-[#8e8d9a]">₽</span>
+              <span class="text-xs font-medium text-[#8e8d9a]">сом</span>
             </div>
 
             <!-- Пирамида аромата -->
@@ -573,7 +573,7 @@
 
     // --- Генерация ссылки заказа в WhatsApp ---
     function buildWhatsAppUrl(productName, productSize, productPrice) {
-      const message = `Здравствуйте! Хочу заказать у вас парфюм: ${productName} (${productSize}) за ${Number(productPrice).toLocaleString('ru-RU')} руб.`;
+      const message = `Здравствуйте! Хочу заказать у вас парфюм: ${productName} (${productSize}) за ${Number(productPrice).toLocaleString('ru-RU')} сом.`;
       return `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
     }
 
@@ -705,7 +705,7 @@
                 <span class="font-serif text-xl sm:text-2xl font-semibold text-[#cbb592]">
                   ${price.toLocaleString('ru-RU')}
                 </span>
-                <span class="text-xs font-medium text-[#8e8d9a]">₽</span>
+                <span class="text-xs font-medium text-[#8e8d9a]">сом</span>
               </div>
 
               <!-- Кнопка заказа в WhatsApp -->
