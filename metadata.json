@@ -1,0 +1,6 @@
+{
+  "name": "Витрина товаров — Панель администратора",
+  "description": "Легкая визуальная админ-панель для онлайн-витрины с загрузкой фото в Supabase Storage и управлением каталогом товаров.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
