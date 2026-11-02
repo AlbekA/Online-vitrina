@@ -467,8 +467,16 @@
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5aWZvamlvcXJrcm5qa21ja2FuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM1OTY0ODIsImV4cCI6MjEwOTE3MjQ4Mn0.lOixzo1Rj0tvtgk8tRHtNKc7J4f13L3t4MsxYY4xue8";
     const TABLE_NAME = "products";
 
-    // Инициализация официального клиента Supabase JS v2
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // Безопасная инициализация клиента Supabase
+    let sbClient = null;
+    function getSupabase() {
+      if (!sbClient) {
+        if (window.supabase && typeof window.supabase.createClient === 'function') {
+          sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
+      }
+      return sbClient;
+    }
 
     // Локальное состояние
     let productsList = [];
@@ -578,7 +586,10 @@
       emptyEl.classList.add("hidden");
 
       try {
-        const { data, error } = await supabase
+        const client = getSupabase();
+        if (!client) throw new Error("Supabase клиент не загружен");
+
+        const { data, error } = await client
           .from(TABLE_NAME)
           .select("*")
           .order("id", { ascending: false });
